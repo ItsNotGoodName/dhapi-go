@@ -30,10 +30,13 @@ func Login(ctx context.Context, conn ConnLogin, username, password string) error
 
 	// Encrypt password based on the first login and then do a second login
 	passwordHash := firstLogin.Params.HashPassword(username, password)
-	err = SecondLogin(ctx, conn, username, passwordHash, loginType, firstLogin.Params.Encryption)
+	secondLogin, err := SecondLogin(ctx, conn, username, passwordHash, loginType, firstLogin.Params.Encryption)
 	if err != nil {
 		return err
 	}
+
+	// Newer cameras (5.0) change session on sucessful login
+	conn.SetSession(string(secondLogin.Session))
 
 	return nil
 }

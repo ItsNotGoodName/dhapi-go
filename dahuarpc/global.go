@@ -19,8 +19,8 @@ func FirstLogin(ctx context.Context, c Conn, username string) (Response[AuthPara
 		}))
 }
 
-func SecondLogin(ctx context.Context, c Conn, username, password, loginType, authorityType string) error {
-	_, err := Send[any](ctx, c, NewLogin("global.login").
+func SecondLogin(ctx context.Context, c Conn, username, password, loginType, authorityType string) (Response[any], error) {
+	return Send[any](ctx, c, NewLogin("global.login").
 		Params(struct {
 			Username      string `json:"userName"`
 			Password      string `json:"password"`
@@ -34,7 +34,6 @@ func SecondLogin(ctx context.Context, c Conn, username, password, loginType, aut
 			ClientType:    "Web3.0",
 			AuthorityType: authorityType,
 		}))
-	return err
 }
 
 func GetCurrentTime(ctx context.Context, c Conn) (string, error) {
