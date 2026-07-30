@@ -106,7 +106,7 @@ func Test_NewTimeSectionFromRange(t *testing.T) {
 	}
 
 	for _, arg := range args {
-		ts := NewTimeSectionFromRange(arg.Number, arg.Start, arg.End)
+		ts := NewTimeSection(arg.Number, TimeSectionDuration(arg.Start), TimeSectionDuration(arg.End))
 		assert.Equal(t, arg.Output, ts)
 	}
 }

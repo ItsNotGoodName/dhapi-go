@@ -164,11 +164,11 @@ func NewTimeSectionFromString(s string) (TimeSection, error) {
 	}, nil
 }
 
-func NewTimeSectionFromRange(number int, start, end time.Time) TimeSection {
+func NewTimeSection(number int, start, end time.Duration) TimeSection {
 	return TimeSection{
 		Number: number,
-		Start:  time.Duration(start.Hour())*time.Hour + time.Duration(start.Minute())*time.Minute + time.Duration(start.Second())*time.Second,
-		End:    time.Duration(end.Hour())*time.Hour + time.Duration(end.Minute())*time.Minute + time.Duration(end.Second())*time.Second,
+		Start:  start,
+		End:    end,
 	}
 }
 
@@ -230,5 +230,88 @@ func (s TimeSection) String() string {
 		int(s.End.Hours()),
 		int(s.End.Minutes())%60,
 		int(s.End.Seconds())%60,
+	)
+}
+
+// NewTimeSection2FromString (e.g. "01:15:00-05:00:00 Night").
+func NewTimeSection2FromString(s string) (TimeSection2, error) {
+	splitBySpace := strings.Split(s, " ")
+	if len(splitBySpace) != 2 {
+		return TimeSection2{}, fmt.Errorf("invalid number of spaces: %d", len(splitBySpace))
+	}
+
+	splitByDash := strings.Split(splitBySpace[0], "-")
+	if len(splitByDash) != 2 {
+		return TimeSection2{}, fmt.Errorf("invalid number of dashes: %d", len(splitByDash))
+	}
+
+	start, err := durationFromTimeString(splitByDash[0])
+	if err != nil {
+		return TimeSection2{}, err
+	}
+
+	end, err := durationFromTimeString(splitByDash[1])
+	if err != nil {
+		return TimeSection2{}, err
+	}
+
+	return TimeSection2{
+		Start:   start,
+		End:     end,
+		Profile: splitBySpace[1],
+	}, nil
+}
+
+func TimeSectionDuration(t time.Time) time.Duration {
+	return time.Duration(t.Hour())*time.Hour + time.Duration(t.Minute())*time.Minute + time.Duration(t.Second())*time.Second
+}
+
+func NewTimeSection2(start, end time.Duration, profile string) TimeSection2 {
+	return TimeSection2{
+		Start:   start,
+		End:     end,
+		Profile: profile,
+	}
+}
+
+type TimeSection2 struct {
+	Start   time.Duration
+	End     time.Duration
+	Profile string
+}
+
+func (s *TimeSection2) UnmarshalJSON(data []byte) error {
+	var str string
+	err := json.Unmarshal(data, &str)
+	if err != nil {
+		return err
+	}
+
+	res, err := NewTimeSection2FromString(str)
+	if err != nil {
+		return err
+	}
+
+	s.Start = res.Start
+	s.End = res.End
+	s.Profile = res.Profile
+
+	return nil
+}
+
+func (s TimeSection2) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.String())
+}
+
+func (s TimeSection2) String() string {
+	return fmt.Sprintf(
+		"%02d:%02d:%02d-%02d:%02d:%02d %s",
+		int(s.Start.Hours()),
+		int(s.Start.Minutes())%60,
+		int(s.Start.Seconds())%60,
+		int(s.End.Hours()),
+		int(s.End.Minutes())%60,
+		int(s.End.Seconds())%60,
+		s.Profile,
 	)
 }
