@@ -21,16 +21,16 @@ type AuthParam struct {
 func (a AuthParam) HashPassword(username, password string) string {
 	switch a.Encryption {
 	case "Basic":
-		return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", username, password)))
+		return base64.StdEncoding.EncodeToString(fmt.Appendf(nil, "%s:%s", username, password))
 	case "Default":
 		return strings.ToUpper(fmt.Sprintf("%x",
-			md5.Sum([]byte(fmt.Sprintf(
+			md5.Sum(fmt.Appendf(nil,
 				"%s:%s:%s",
 				username,
 				a.Random,
 				strings.ToUpper(fmt.Sprintf(
 					"%x",
-					md5.Sum([]byte(fmt.Sprintf("%s:%s:%s", username, a.Realm, password))))))))))
+					md5.Sum(fmt.Appendf(nil, "%s:%s:%s", username, a.Realm, password))))))))
 	default:
 		return password
 	}

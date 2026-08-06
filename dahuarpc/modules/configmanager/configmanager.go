@@ -11,7 +11,7 @@ type ConfigData interface {
 	// Merge should merge its own data with the input js.
 	// The return should be the merged data.
 	Merge(js string) (string, error)
-	// Validate its own data.
+	// Validate is run when unmarshalling.
 	Validate() error
 }
 
