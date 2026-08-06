@@ -61,7 +61,7 @@ const (
 	SwitchModeNight
 	SwitchModeSchedule
 	SwitchModeBrightness
-	SwitchModeProfiles
+	SwitchModeTimePlan
 	SwitchModeUnknown
 )
 
@@ -77,8 +77,8 @@ func (m SwitchMode) String() string {
 		return "schedule"
 	case SwitchModeBrightness:
 		return "brightness"
-	case SwitchModeProfiles:
-		return "profiles"
+	case SwitchModeTimePlan:
+		return "time-plan"
 	default:
 		return "unknown"
 	}
@@ -101,7 +101,7 @@ func (m VideoInMode) SwitchMode() SwitchMode {
 		return SwitchModeBrightness
 	}
 	if m.Mode == 3 && slices.Equal(m.Config, []int{}) {
-		return SwitchModeProfiles
+		return SwitchModeTimePlan
 	}
 	return SwitchModeUnknown
 }
@@ -123,7 +123,7 @@ func (m *VideoInMode) SetSwitchMode(mode SwitchMode) {
 	case SwitchModeBrightness:
 		m.Mode = 2
 		m.Config = []int{0, 1}
-	case SwitchModeProfiles:
+	case SwitchModeTimePlan:
 		m.Mode = 3
 		m.Config = []int{}
 	}
